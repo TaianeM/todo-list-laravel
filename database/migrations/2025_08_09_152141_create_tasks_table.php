@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('description');
             $table->enum('status', array_column(TaskStatus::cases(), 'value'))
             ->default(TaskStatus::PENDING->value);
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->date('due_date')->nullable();
             $table->timestamps();
         });
