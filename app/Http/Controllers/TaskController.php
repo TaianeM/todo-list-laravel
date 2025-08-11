@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TaskStatus;
 use App\Models\Task;
 use Inertia\Inertia;
 use App\Http\Requests\TaskRequest;
@@ -16,16 +17,26 @@ class TaskController extends Controller
     }
 
     public function create()
-    {
-        return Inertia::render('tasks/Create');
-    }
+{
+    $statuses = collect(TaskStatus::cases())
+        ->map(fn($c) => ['value' => $c->value, 'label' => ucfirst($c->value)])
+        ->all();
 
-    public function store(TaskRequest $request)
-    {
-        Task::create($request->validated());
+    return Inertia::render('tasks/Create', [
+        'statuses' => $statuses,
+    ]);
+}
 
-        return to_route('tasks.index')->with('success', 'Task created successfully.');
-    }
+public function store(TaskRequest $request)
+{
+    $data = $request->validated();
+    $data['user_id'] = auth()->id();
+
+    $task = Task::create($data);
+
+    return redirect()->route('tasks.index')
+        ->with('success', 'Task criada com sucesso!');
+}
 
     public function edit(Task $task)
     {
@@ -47,4 +58,18 @@ class TaskController extends Controller
 
         return back()->with('success', 'Task deleted successfully.');
     }
+
+    public function move(Task $task)
+{
+    request()->validate(['status' => 'required|in:todo,doing,done']);
+    $task->update(['status' => request('status')]);
+
+    // Se estiver em página Inertia, use back com flash;
+    // via API, retorne JSON:
+    if (request()->wantsJson()) {
+        return response()->json(['message' => 'Status atualizado', 'task' => $task], 200);
+    }
+    return back();
+}
+
 }

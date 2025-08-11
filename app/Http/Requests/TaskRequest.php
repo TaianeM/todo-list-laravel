@@ -28,7 +28,7 @@ class TaskRequest extends FormRequest
             'description' => ['required', 'string'],
             'status'      => ['required', Rule::in(array_column(TaskStatus::cases(), 'value'))],
             'due_date'    => ['nullable', 'date'],
-            'user_id'     => ['required', 'exists:users,id'],
+            // 'user_id'     => ['required', 'exists:users,id'],
         ];
     }
 }

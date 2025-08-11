@@ -30,6 +30,8 @@ Route::middleware(['auth'])
         Route::put('/{task}', 'update')->name('update');
         Route::patch('/{task}', 'update');
         Route::delete('/{task}', 'destroy')->name('destroy');
+
+        Route::patch('/{task}/move', 'move')->name('move');
 });
 
 require __DIR__.'/settings.php';
