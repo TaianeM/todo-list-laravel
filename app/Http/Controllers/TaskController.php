@@ -17,26 +17,26 @@ class TaskController extends Controller
     }
 
     public function create()
-{
-    $statuses = collect(TaskStatus::cases())
-        ->map(fn($c) => ['value' => $c->value, 'label' => ucfirst($c->value)])
-        ->all();
+    {
+        $statuses = collect(TaskStatus::cases())
+            ->map(fn($c) => ['value' => $c->value, 'label' => ucfirst($c->value)])
+            ->all();
 
-    return Inertia::render('tasks/Create', [
-        'statuses' => $statuses,
-    ]);
-}
+        return Inertia::render('tasks/Create', [
+            'statuses' => $statuses,
+        ]);
+    }
 
-public function store(TaskRequest $request)
-{
-    $data = $request->validated();
-    $data['user_id'] = auth()->id();
+    public function store(TaskRequest $request)
+    {
+        $data = $request->validated();
+        $data['user_id'] = auth()->id();
 
-    $task = Task::create($data);
+        $task = Task::create($data);
 
-    return redirect()->route('tasks.index')
-        ->with('success', 'Task criada com sucesso!');
-}
+        return redirect()->route('tasks.index')
+            ->with('success', 'Task criada com sucesso!');
+    }
 
     public function edit(Task $task)
     {
@@ -60,16 +60,13 @@ public function store(TaskRequest $request)
     }
 
     public function move(Task $task)
-{
-    request()->validate(['status' => 'required|in:todo,doing,done']);
-    $task->update(['status' => request('status')]);
+    {
+        request()->validate(['status' => 'required|in:todo,doing,done']);
+        $task->update(['status' => request('status')]);
 
-    // Se estiver em página Inertia, use back com flash;
-    // via API, retorne JSON:
-    if (request()->wantsJson()) {
-        return response()->json(['message' => 'Status atualizado', 'task' => $task], 200);
+        if (request()->wantsJson()) {
+            return response()->json(['message' => 'Status atualizado', 'task' => $task], 200);
+        }
+        return back();
     }
-    return back();
-}
-
 }

@@ -10,9 +10,9 @@ const props = defineProps({
 })
 
 const COLS = [
-  { key: 'pending',  title: 'To Do',   accent: 'bg-sky-500' },
-  { key: 'progress', title: 'Doing',   accent: 'bg-amber-500' },
-  { key: 'completed',  title: 'Done',    accent: 'bg-emerald-500' },
+  { key: 'pending', title: 'To Do', accent: 'bg-sky-500' },
+  { key: 'progress', title: 'Doing', accent: 'bg-amber-500' },
+  { key: 'completed', title: 'Done', accent: 'bg-emerald-500' },
 ]
 
 const itemsByCol = computed(() =>
@@ -38,29 +38,26 @@ function onDrop(colKey) {
     router.patch(route('tasks.move', id), { status: colKey }, { preserveScroll: true })
   }
 }
-function allowDrop(e){ e.preventDefault() }
+function allowDrop(e) { e.preventDefault() }
 </script>
 
 <template>
   <AppLayout>
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-semibold tracking-tight ml-3">Tasks</h1>
-      <Button :href="route('tasks.create')" :preserve-state="false" :preserve-scroll="false" replace class="mt-3 mr-3"
-       >Nova Task</Button>
+      <Button as-child class="mt-3 mr-3">
+        <Link :href="route('tasks.create')" :preserve-state="false" :preserve-scroll="false" replace>
+        Nova Task
+        </Link>
+      </Button>
     </div>
 
     <div v-if="!tasks?.length" class="text-gray-600">Sem tasks.</div>
 
     <div v-else class="grid md:grid-cols-3 gap-4 ml-3 mr-3">
-      <section
-        v-for="c in COLS"
-        :key="c.key"
-        class="rounded-2xl border border-gray-200 bg-white/60 backdrop-blur p-3 shadow-sm"
-        @dragover="allowDrop"
-        @dragenter="onDragEnter(c.key)"
-        @dragleave="onDragLeave"
-        @drop="onDrop(c.key)"
-      >
+      <section v-for="c in COLS" :key="c.key"
+        class="rounded-2xl border border-gray-200 bg-white/60 backdrop-blur p-3 shadow-sm" @dragover="allowDrop"
+        @dragenter="onDragEnter(c.key)" @dragleave="onDragLeave" @drop="onDrop(c.key)">
         <header class="flex items-center justify-between px-2 pb-3">
           <div class="flex items-center gap-2">
             <span :class="['h-2.5 w-2.5 rounded-full', c.accent]"></span>
@@ -69,19 +66,13 @@ function allowDrop(e){ e.preventDefault() }
           <span class="text-xs text-gray-500">{{ itemsByCol[c.key].length }}</span>
         </header>
 
-        <div
-          :class="[
-            'min-h-[280px] rounded-xl p-2 transition',
-            overCol === c.key ? 'ring-2 ring-offset-2 ring-sky-400 bg-sky-50/60' : 'bg-gray-50'
-          ]"
-        >
-          <article
-            v-for="t in itemsByCol[c.key]"
-            :key="t.id"
+        <div :class="[
+          'min-h-[280px] rounded-xl p-2 transition',
+          overCol === c.key ? 'ring-2 ring-offset-2 ring-sky-400 bg-sky-50/60' : 'bg-gray-50'
+        ]">
+          <article v-for="t in itemsByCol[c.key]" :key="t.id"
             class="group cursor-grab active:cursor-grabbing mb-2 rounded-xl border border-gray-200 bg-white p-3 shadow hover:shadow-md transition"
-            draggable="true"
-            @dragstart="onDragStart(t.id)"
-          >
+            draggable="true" @dragstart="onDragStart(t.id)">
             <div class="font-medium text-gray-900">{{ t.name }}</div>
             <div class="mt-1 text-xs text-gray-500">
               Status: <span class="font-medium">{{ t.status }}</span>
